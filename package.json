@@ -1,5 +1,5 @@
 {
-  "name": "tanstack-start-example-basic-react-query",
+  "name": "crossposting",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -8,9 +8,15 @@
     "build": "vite build && tsc --noEmit",
     "start": "vite start",
     "format": "prettier . --write --cache",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "prisma": "prisma",
+    "tunnel": "pnpx untun@latest tunnel http://localhost:3000"
   },
   "dependencies": {
+    "@atproto/api": "^0.16.9",
+    "@atproto/jwk-jose": "^0.1.10",
+    "@atproto/oauth-client-node": "^0.3.8",
+    "@prisma/client": "6.16.1",
     "@radix-ui/react-slot": "^1.2.3",
     "@tanstack/react-query": "^5.66.0",
     "@tanstack/react-query-devtools": "^5.66.0",
@@ -24,11 +30,13 @@
     "date-fns": "^4.1.0",
     "iron-session": "^8.0.4",
     "lucide-react": "^0.540.0",
+    "prisma": "^6.16.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "redaxios": "^0.5.1",
     "tailwind-merge": "^2.6.0",
-    "twitter-api-sdk": "^1.2.1"
+    "twitter-api-sdk": "^1.2.1",
+    "zod": "^4.1.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
