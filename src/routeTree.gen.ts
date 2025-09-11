@@ -13,6 +13,9 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { ServerRoute as CallbackTwitterServerRouteImport } from './routes/callback/twitter'
+import { ServerRoute as CallbackBlueskyServerRouteImport } from './routes/callback/bluesky'
+import { ServerRoute as AuthJwksServerRouteImport } from './routes/auth/jwks'
+import { ServerRoute as AuthClientMetadataServerRouteImport } from './routes/auth/client-metadata'
 
 const rootServerRouteImport = createServerRootRoute()
 
@@ -26,6 +29,22 @@ const CallbackTwitterServerRoute = CallbackTwitterServerRouteImport.update({
   path: '/callback/twitter',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const CallbackBlueskyServerRoute = CallbackBlueskyServerRouteImport.update({
+  id: '/callback/bluesky',
+  path: '/callback/bluesky',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const AuthJwksServerRoute = AuthJwksServerRouteImport.update({
+  id: '/auth/jwks',
+  path: '/auth/jwks',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const AuthClientMetadataServerRoute =
+  AuthClientMetadataServerRouteImport.update({
+    id: '/auth/client-metadata',
+    path: '/auth/client-metadata',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -49,24 +68,49 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
 }
 export interface FileServerRoutesByFullPath {
+  '/auth/client-metadata': typeof AuthClientMetadataServerRoute
+  '/auth/jwks': typeof AuthJwksServerRoute
+  '/callback/bluesky': typeof CallbackBlueskyServerRoute
   '/callback/twitter': typeof CallbackTwitterServerRoute
 }
 export interface FileServerRoutesByTo {
+  '/auth/client-metadata': typeof AuthClientMetadataServerRoute
+  '/auth/jwks': typeof AuthJwksServerRoute
+  '/callback/bluesky': typeof CallbackBlueskyServerRoute
   '/callback/twitter': typeof CallbackTwitterServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
+  '/auth/client-metadata': typeof AuthClientMetadataServerRoute
+  '/auth/jwks': typeof AuthJwksServerRoute
+  '/callback/bluesky': typeof CallbackBlueskyServerRoute
   '/callback/twitter': typeof CallbackTwitterServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/callback/twitter'
+  fullPaths:
+    | '/auth/client-metadata'
+    | '/auth/jwks'
+    | '/callback/bluesky'
+    | '/callback/twitter'
   fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/callback/twitter'
-  id: '__root__' | '/callback/twitter'
+  to:
+    | '/auth/client-metadata'
+    | '/auth/jwks'
+    | '/callback/bluesky'
+    | '/callback/twitter'
+  id:
+    | '__root__'
+    | '/auth/client-metadata'
+    | '/auth/jwks'
+    | '/callback/bluesky'
+    | '/callback/twitter'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
+  AuthClientMetadataServerRoute: typeof AuthClientMetadataServerRoute
+  AuthJwksServerRoute: typeof AuthJwksServerRoute
+  CallbackBlueskyServerRoute: typeof CallbackBlueskyServerRoute
   CallbackTwitterServerRoute: typeof CallbackTwitterServerRoute
 }
 
@@ -90,6 +134,27 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof CallbackTwitterServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/callback/bluesky': {
+      id: '/callback/bluesky'
+      path: '/callback/bluesky'
+      fullPath: '/callback/bluesky'
+      preLoaderRoute: typeof CallbackBlueskyServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/auth/jwks': {
+      id: '/auth/jwks'
+      path: '/auth/jwks'
+      fullPath: '/auth/jwks'
+      preLoaderRoute: typeof AuthJwksServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/auth/client-metadata': {
+      id: '/auth/client-metadata'
+      path: '/auth/client-metadata'
+      fullPath: '/auth/client-metadata'
+      preLoaderRoute: typeof AuthClientMetadataServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
   }
 }
 
@@ -100,6 +165,9 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
+  AuthClientMetadataServerRoute: AuthClientMetadataServerRoute,
+  AuthJwksServerRoute: AuthJwksServerRoute,
+  CallbackBlueskyServerRoute: CallbackBlueskyServerRoute,
   CallbackTwitterServerRoute: CallbackTwitterServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport

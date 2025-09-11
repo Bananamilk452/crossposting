@@ -7,9 +7,18 @@ interface TwitterUser {
   avatar?: string;
   accessToken: string;
 }
+interface BlueskyUser {
+  did: string;
+  handle: string;
+  displayName?: string;
+  avatar?: string;
+  description?: string;
+  banner?: string;
+}
 
 export type Session = {
   twitter?: TwitterUser;
+  bluesky?: BlueskyUser;
 };
 
 export async function getOptionalSession() {
