@@ -18,14 +18,17 @@
     "@tanstack/react-router-devtools": "^1.131.27",
     "@tanstack/react-router-ssr-query": "^1.131.27",
     "@tanstack/react-start": "^1.131.27",
+    "arctic": "^3.7.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "iron-session": "^8.0.4",
     "lucide-react": "^0.540.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "redaxios": "^0.5.1",
-    "tailwind-merge": "^2.6.0"
+    "tailwind-merge": "^2.6.0",
+    "twitter-api-sdk": "^1.2.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
