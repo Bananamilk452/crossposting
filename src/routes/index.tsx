@@ -1,8 +1,9 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { PlusIcon, Trash2Icon } from "lucide-react";
-import { SVGProps } from "react";
+import { SVGProps, useState } from "react";
 
+import { AddAccountModal } from "~/components/AddAccountModal";
 import { BlueskyIcon } from "~/components/icons/BlueskyIcon";
 import { MisskeyIcon } from "~/components/icons/MisskeyIcon";
 import { TwitterIcon } from "~/components/icons/TwitterIcon";
@@ -68,6 +69,8 @@ function AccountListItem({ account }: { account: Account }) {
 }
 
 function Home() {
+  const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false);
+
   const { data: session } = useSuspenseQuery(getSessionQueryOptions);
 
   const accounts: Account[] = [];
@@ -92,16 +95,13 @@ function Home() {
       Icon: MisskeyIcon,
     });
   }
-
-  console.log(session);
-
   return (
     <div className="mx-auto w-1/2 p-4">
       <Card>
         <CardHeader>
           <CardTitle>계정 목록</CardTitle>
           <CardAction>
-            <Button>
+            <Button onClick={() => setIsAddAccountModalOpen(true)}>
               <PlusIcon />
               계정 추가
             </Button>
@@ -113,9 +113,21 @@ function Home() {
             {accounts.map((account) => (
               <AccountListItem key={account.platform} account={account} />
             ))}
+
+            {accounts.length === 0 && (
+              <p className="py-4 text-center text-sm text-gray-500">
+                추가된 계정이 없습니다. "계정 추가" 버튼을 눌러 계정을 추가해
+                주세요.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
+
+      <AddAccountModal
+        open={isAddAccountModalOpen}
+        setOpen={setIsAddAccountModalOpen}
+      />
     </div>
   );
 }

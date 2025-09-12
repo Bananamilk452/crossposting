@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { blueskyClient } from "~/lib/bluesky/client";
 
-const BlueskySignInSchema = z.object({
+export const BlueskySignInSchema = z.object({
   handle: z
     .string()
     .min(1, "Bluesky 핸들을 입력해주세요.")

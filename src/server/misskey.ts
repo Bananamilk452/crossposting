@@ -5,7 +5,7 @@ import { z } from "zod";
 import { MISSKEY } from "~/constants";
 import { getOAuth2CallbackURL, getOAuth2Endpoint } from "~/lib/misskey";
 
-const MisskeySignInSchema = z.object({
+export const MisskeySignInSchema = z.object({
   hostname: z.string().regex(z.regexes.hostname),
 });
 
