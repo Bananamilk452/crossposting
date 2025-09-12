@@ -85,3 +85,28 @@ export async function getMe(hostname: string, accessToken: string) {
 
   return user;
 }
+
+export async function createNote(
+  hostname: string,
+  accessToken: string,
+  params: { content: string; visibility: string },
+) {
+  const { content, visibility } = params;
+
+  const note = await ky
+    .post<{ createdNote: { id: string } }>(
+      `https://${hostname}/api/notes/create`,
+      {
+        json: {
+          text: content,
+          visibility,
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    )
+    .json();
+
+  return note.createdNote.id;
+}

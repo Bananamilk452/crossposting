@@ -3,7 +3,11 @@ import { setCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 import { MISSKEY } from "~/constants";
-import { getOAuth2CallbackURL, getOAuth2Endpoint } from "~/lib/misskey";
+import {
+  createNote,
+  getOAuth2CallbackURL,
+  getOAuth2Endpoint,
+} from "~/lib/misskey";
 import { getOptionalSession } from "~/lib/session";
 
 export const MisskeySignInSchema = z.object({
@@ -60,3 +64,39 @@ export const misskeySignOut = createServerFn({
 
   return {};
 });
+
+const writerFormSchema = z.object({
+  content: z.string().min(1, "내용을 입력해주세요"),
+  visibility: z.enum(MISSKEY.VISIBILITIES),
+});
+
+export const misskeyPost = createServerFn({
+  method: "POST",
+})
+  .validator((data: unknown) => {
+    return writerFormSchema.parse(data);
+  })
+  .handler(async (ctx) => {
+    const { content, visibility } = ctx.data;
+
+    const session = await getOptionalSession();
+
+    if (
+      !session.data.misskey ||
+      !session.data.misskeyAccessToken ||
+      !session.data.misskey.host
+    ) {
+      throw new Error("Misskey 계정이 연결되어 있지 않습니다.");
+    }
+
+    const id = await createNote(
+      session.data.misskey.host,
+      session.data.misskeyAccessToken,
+      {
+        content,
+        visibility,
+      },
+    );
+
+    return { id };
+  });
