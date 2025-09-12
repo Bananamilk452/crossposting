@@ -54,6 +54,7 @@ export const misskeySignOut = createServerFn({
   const data = session.data;
 
   delete data.misskey;
+  delete data.misskeyAccessToken;
 
   await session.update(data);
 

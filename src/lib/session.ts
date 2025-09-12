@@ -23,10 +23,20 @@ export interface MisskeyUser {
   avatarUrl?: string;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  handle: string;
+  avatar?: string;
+  host?: string;
+}
+
 export type Session = {
-  twitter?: TwitterUser & { accessToken: string };
-  bluesky?: BlueskyUser;
-  misskey?: MisskeyUser & { accessToken: string };
+  twitter?: User;
+  bluesky?: User;
+  misskey?: User;
+  twitterAccessToken?: string;
+  misskeyAccessToken?: string;
 };
 
 export async function getOptionalSession() {

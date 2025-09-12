@@ -46,6 +46,7 @@ export const twitterSignOut = createServerFn({
   const data = session.data;
 
   delete data.twitter;
+  delete data.twitterAccessToken;
 
   await session.update(data);
 

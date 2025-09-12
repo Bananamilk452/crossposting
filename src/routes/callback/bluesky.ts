@@ -28,12 +28,10 @@ export const ServerRoute = createServerFileRoute("/callback/bluesky").methods({
       const session = await getOptionalSession();
       await session.update({
         bluesky: {
-          did: data.did,
+          id: data.did,
+          name: data.displayName || data.handle,
           handle: data.handle,
-          displayName: data.displayName,
           avatar: data.avatar,
-          description: data.description,
-          banner: data.banner,
         },
       });
 

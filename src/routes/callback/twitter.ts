@@ -44,10 +44,10 @@ export const ServerRoute = createServerFileRoute("/callback/twitter").methods({
         twitter: {
           id: user.id,
           name: user.name,
-          username: user.username,
+          handle: user.username,
           avatar: user.profile_image_url,
-          accessToken,
         },
+        twitterAccessToken: accessToken,
       });
 
       return Response.redirect(`${process.env.PUBLIC_URL}`);

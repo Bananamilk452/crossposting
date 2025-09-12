@@ -47,12 +47,12 @@ export const ServerRoute = createServerFileRoute("/callback/misskey").methods({
       await session.update({
         misskey: {
           id: user.id,
-          username: user.username,
           name: user.name,
-          avatarUrl: user.avatarUrl,
+          handle: user.username,
+          avatar: user.avatarUrl,
           host: hostname,
-          accessToken,
         },
+        misskeyAccessToken: accessToken,
       });
 
       return Response.redirect(`${process.env.PUBLIC_URL}`);
