@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { SELECTION_LOCAL_STORAGE_KEY } from "~/constants";
 import { getSessionQueryOptions } from "~/server/session";
 
 export const Route = createFileRoute("/")({
@@ -23,12 +24,22 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const [selection, setSelection] = useState<string[]>([]);
+  const [selection, setSelection] = useState<string[]>(
+    JSON.parse(localStorage.getItem(SELECTION_LOCAL_STORAGE_KEY) || "[]"),
+  );
   const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false);
 
   const { data: session } = useSuspenseQuery(getSessionQueryOptions);
 
   const isEmpty = !session.twitter && !session.bluesky && !session.misskey;
+
+  function setSelectionAndStore(newSelection: string[]) {
+    setSelection(newSelection);
+    localStorage.setItem(
+      SELECTION_LOCAL_STORAGE_KEY,
+      JSON.stringify(newSelection),
+    );
+  }
   return (
     <div className="mx-auto w-1/2 p-4">
       <Card>
@@ -47,7 +58,7 @@ function Home() {
             <AccountList
               session={session}
               selection={selection}
-              setSelection={setSelection}
+              setSelection={setSelectionAndStore}
             />
 
             {isEmpty && (

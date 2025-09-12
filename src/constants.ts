@@ -11,3 +11,5 @@ export const MISSKEY = {
   CLIENT_ID: process.env.PUBLIC_URL!,
   REDIRECT_URI: `${process.env.PUBLIC_URL}/callback/misskey`,
 };
+
+export const SELECTION_LOCAL_STORAGE_KEY = "selected_platforms";
