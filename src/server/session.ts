@@ -1,3 +1,4 @@
+import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 
 import { getOptionalSession } from "~/lib/session";
@@ -8,4 +9,9 @@ export const getSessionServer = createServerFn({
   const session = await getOptionalSession();
 
   return session.data;
+});
+
+export const getSessionQueryOptions = queryOptions({
+  queryKey: ["session"],
+  queryFn: () => getSessionServer(),
 });
