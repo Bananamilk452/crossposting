@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { setCookie } from "@tanstack/react-start/server";
 import * as arctic from "arctic";
 
+import { TWITTER } from "~/constants";
+
 export const twitterSignIn = createServerFn({
   method: "GET",
 }).handler(async () => {
@@ -13,22 +15,21 @@ export const twitterSignIn = createServerFn({
 
   const state = arctic.generateState();
   const codeVerifier = arctic.generateCodeVerifier();
-  const scopes = ["users.read", "tweet.read", "tweet.write"];
+  const scopes = TWITTER.SCOPES;
   const url = twitter.createAuthorizationURL(state, codeVerifier, scopes);
 
-  setCookie("state", state, {
-    secure: true, // set to false in localhost
+  setCookie(TWITTER.STATE_COOKIE_NAME, state, {
+    secure: true,
     path: "/",
     httpOnly: true,
-    maxAge: 60 * 10, // 10 min
+    maxAge: 60 * 10,
   });
 
-  // store code verifier as cookie
-  setCookie("code_verifier", codeVerifier, {
-    secure: true, // set to false in localhost
+  setCookie(TWITTER.CODE_VERIFIER_COOKIE_NAME, codeVerifier, {
+    secure: true,
     path: "/",
     httpOnly: true,
-    maxAge: 60 * 10, // 10 min
+    maxAge: 60 * 10,
   });
 
   return {

@@ -2,6 +2,7 @@ import { createServerFileRoute, getCookie } from "@tanstack/react-start/server";
 import * as arctic from "arctic";
 import { Client } from "twitter-api-sdk";
 
+import { TWITTER } from "~/constants";
 import { getOptionalSession } from "~/lib/session";
 
 export const ServerRoute = createServerFileRoute("/callback/twitter").methods({
@@ -15,8 +16,8 @@ export const ServerRoute = createServerFileRoute("/callback/twitter").methods({
     const searchParams = new URL(request.url).searchParams;
     const code = searchParams.get("code");
     const state = searchParams.get("state");
-    const storedState = getCookie("state");
-    const storedCodeVerifier = getCookie("code_verifier");
+    const storedState = getCookie(TWITTER.STATE_COOKIE_NAME);
+    const storedCodeVerifier = getCookie(TWITTER.CODE_VERIFIER_COOKIE_NAME);
 
     if (!code || !storedState || !storedCodeVerifier || state !== storedState) {
       throw new Error("Invalid request");
