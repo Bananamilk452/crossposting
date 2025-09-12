@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { setCookie } from "@tanstack/react-start/server";
 import * as arctic from "arctic";
+import { Client } from "twitter-api-sdk";
+import z from "zod/v3";
 
 import { TWITTER } from "~/constants";
 import { getOptionalSession } from "~/lib/session";
@@ -52,3 +54,31 @@ export const twitterSignOut = createServerFn({
 
   return {};
 });
+
+const writerFormSchema = z.object({
+  content: z.string().min(1, "내용을 입력해주세요"),
+});
+
+export const twitterPost = createServerFn({
+  method: "POST",
+})
+  .validator((data: unknown) => {
+    return writerFormSchema.parse(data);
+  })
+  .handler(async (ctx) => {
+    const { content } = ctx.data;
+
+    const session = await getOptionalSession();
+
+    if (!session.data.twitter || !session.data.twitterAccessToken) {
+      throw new Error("Twitter 계정이 없습니다.");
+    }
+
+    const twitter = new Client(session.data.twitterAccessToken);
+
+    const tweet = await twitter.tweets.createTweet({ text: content });
+
+    return {
+      id: tweet.data?.id,
+    };
+  });
