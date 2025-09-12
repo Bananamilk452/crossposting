@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { MISSKEY } from "~/constants";
 import { getOAuth2CallbackURL, getOAuth2Endpoint } from "~/lib/misskey";
+import { getOptionalSession } from "~/lib/session";
 
 export const MisskeySignInSchema = z.object({
   hostname: z.string().regex(z.regexes.hostname),
@@ -44,3 +45,17 @@ export const misskeySignin = createServerFn({
       url: redirectURL,
     };
   });
+
+export const misskeySignOut = createServerFn({
+  method: "POST",
+}).handler(async () => {
+  const session = await getOptionalSession();
+
+  const data = session.data;
+
+  delete data.misskey;
+
+  await session.update(data);
+
+  return {};
+});

@@ -11,6 +11,7 @@ import * as React from "react";
 
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
 import { NotFound } from "~/components/NotFound";
+import { Toaster } from "~/components/ui/sonner";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
 
@@ -99,6 +100,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="antialiased">
         {children}
+        <Toaster />
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />

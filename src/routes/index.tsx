@@ -1,7 +1,12 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import { SVGProps, useState } from "react";
+import { toast } from "sonner";
 
 import { AddAccountModal } from "~/components/AddAccountModal";
 import { BlueskyIcon } from "~/components/icons/BlueskyIcon";
@@ -12,6 +17,7 @@ import {
   MisskeyProfileBanner,
   TwitterProfileBanner,
 } from "~/components/profile/ProfileBanner";
+import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -21,7 +27,10 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { BlueskyUser, MisskeyUser, TwitterUser } from "~/lib/session";
+import { blueskySignOut } from "~/server/bluesky";
+import { misskeySignOut } from "~/server/misskey";
 import { getSessionQueryOptions } from "~/server/session";
+import { twitterSignOut } from "~/server/twitter";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -35,20 +44,33 @@ type Account =
       platform: "twitter";
       user: TwitterUser;
       Icon: (props: SVGProps<SVGSVGElement>) => React.ReactElement;
+      signOut: typeof twitterSignOut;
     }
   | {
       platform: "bluesky";
       user: BlueskyUser;
       Icon: (props: SVGProps<SVGSVGElement>) => React.ReactElement;
+      signOut: typeof blueskySignOut;
     }
   | {
       platform: "misskey";
       user: MisskeyUser;
       Icon: (props: SVGProps<SVGSVGElement>) => React.ReactElement;
+      signOut: typeof misskeySignOut;
     };
 
 function AccountListItem({ account }: { account: Account }) {
-  const { platform, user, Icon } = account;
+  const queryClient = useQueryClient();
+  const { platform, user, Icon, signOut: signOutFunction } = account;
+
+  const { mutate: signOut, status } = useMutation({
+    mutationFn: () => signOutFunction(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(getSessionQueryOptions);
+      toast.success("계정이 성공적으로 로그아웃되었습니다.");
+    },
+  });
+
   return (
     <div className="flex items-center gap-2">
       <Icon className="size-6" />
@@ -61,7 +83,12 @@ function AccountListItem({ account }: { account: Account }) {
       {platform === "misskey" && (
         <MisskeyProfileBanner className="grow" user={user} />
       )}
-      <Button variant="destructive" className="size-9">
+      {status === "pending" && <Spinner />}
+      <Button
+        variant="destructive"
+        className="size-9"
+        onClick={() => signOut()}
+      >
         <Trash2Icon />
       </Button>
     </div>
@@ -79,6 +106,7 @@ function Home() {
       platform: "twitter",
       user: session.twitter,
       Icon: TwitterIcon,
+      signOut: twitterSignOut,
     });
   }
   if (session.bluesky) {
@@ -86,6 +114,7 @@ function Home() {
       platform: "bluesky",
       user: session.bluesky,
       Icon: BlueskyIcon,
+      signOut: blueskySignOut,
     });
   }
   if (session.misskey) {
@@ -93,6 +122,7 @@ function Home() {
       platform: "misskey",
       user: session.misskey,
       Icon: MisskeyIcon,
+      signOut: misskeySignOut,
     });
   }
   return (

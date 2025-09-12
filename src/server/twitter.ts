@@ -3,6 +3,7 @@ import { setCookie } from "@tanstack/react-start/server";
 import * as arctic from "arctic";
 
 import { TWITTER } from "~/constants";
+import { getOptionalSession } from "~/lib/session";
 
 export const twitterSignIn = createServerFn({
   method: "GET",
@@ -35,4 +36,18 @@ export const twitterSignIn = createServerFn({
   return {
     url: url.toString(),
   };
+});
+
+export const twitterSignOut = createServerFn({
+  method: "POST",
+}).handler(async () => {
+  const session = await getOptionalSession();
+
+  const data = session.data;
+
+  delete data.twitter;
+
+  await session.update(data);
+
+  return {};
 });

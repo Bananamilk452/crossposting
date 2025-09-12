@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { blueskyClient } from "~/lib/bluesky/client";
+import { getOptionalSession } from "~/lib/session";
 
 export const BlueskySignInSchema = z.object({
   handle: z
@@ -37,3 +38,17 @@ export const blueskySignin = createServerFn({
 
     return { url: url.toString() };
   });
+
+export const blueskySignOut = createServerFn({
+  method: "POST",
+}).handler(async () => {
+  const session = await getOptionalSession();
+
+  const data = session.data;
+
+  delete data.bluesky;
+
+  await session.update(data);
+
+  return {};
+});
