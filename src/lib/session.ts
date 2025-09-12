@@ -1,13 +1,12 @@
 import { useSession } from "@tanstack/react-start/server";
 
-interface TwitterUser {
+export interface TwitterUser {
   id: string;
   name: string;
   username: string;
   avatar?: string;
-  accessToken: string;
 }
-interface BlueskyUser {
+export interface BlueskyUser {
   did: string;
   handle: string;
   displayName?: string;
@@ -16,9 +15,18 @@ interface BlueskyUser {
   banner?: string;
 }
 
+export interface MisskeyUser {
+  id: string;
+  name: string;
+  username: string;
+  host: string;
+  avatarUrl?: string;
+}
+
 export type Session = {
-  twitter?: TwitterUser;
+  twitter?: TwitterUser & { accessToken: string };
   bluesky?: BlueskyUser;
+  misskey?: MisskeyUser & { accessToken: string };
 };
 
 export async function getOptionalSession() {

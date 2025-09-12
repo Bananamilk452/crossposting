@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { blueskySignin } from "~/server/bluesky";
+import { misskeySignin } from "~/server/misskey";
 import { getSessionServer } from "~/server/session";
 import { twitterSignIn } from "~/server/twitter";
 
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const [handle, setHandle] = useState("");
+  const [hostname, setHostname] = useState("");
 
   async function handleTwitterSignin() {
     const { url } = await twitterSignIn();
@@ -24,6 +26,15 @@ function Home() {
     const { url } = await blueskySignin({
       data: {
         handle,
+      },
+    });
+    window.location.href = url;
+  }
+
+  async function handleMisskeySignin() {
+    const { url } = await misskeySignin({
+      data: {
+        hostname,
       },
     });
     window.location.href = url;
@@ -46,6 +57,12 @@ function Home() {
         onChange={(e) => setHandle(e.target.value)}
       />
       <Button onClick={handleBlueskySignin}>Bluesky Sign-in</Button>
+      <Input
+        placeholder="Enter your hostname"
+        value={hostname}
+        onChange={(e) => setHostname(e.target.value)}
+      />
+      <Button onClick={handleMisskeySignin}>Misskey Sign-in</Button>
     </div>
   );
 }

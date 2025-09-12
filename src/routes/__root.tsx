@@ -65,6 +65,11 @@ export const Route = createRootRouteWithContext<{
         crossOrigin: "anonymous",
         href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css",
       },
+      // Misskey OAuth2
+      {
+        rel: "redirect_uri",
+        href: "/callback/misskey",
+      },
     ],
   }),
   errorComponent: (props) => {
