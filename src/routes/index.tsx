@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { AddAccountModal } from "~/components/AddAccountModal";
 import { WriterProvider } from "~/components/context/WriterContext";
 import { Header } from "~/components/Header";
 import { QueueList } from "~/components/QueueList";
+import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -22,9 +23,6 @@ import { getSessionQueryOptions } from "~/server/session";
 
 export const Route = createFileRoute("/")({
   component: Home,
-  loader: ({ context }) => {
-    context.queryClient.ensureQueryData(getSessionQueryOptions);
-  },
 });
 
 function Home() {
@@ -38,9 +36,9 @@ function Home() {
   );
   const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false);
 
-  const { data: session } = useSuspenseQuery(getSessionQueryOptions);
+  const { data: session, status } = useQuery(getSessionQueryOptions);
 
-  const isEmpty = !session.twitter && !session.bluesky && !session.misskey;
+  const isEmpty = !session?.twitter && !session?.bluesky && !session?.misskey;
 
   function setSelectionAndStore(newSelection: string[]) {
     setSelection(newSelection);
@@ -66,24 +64,30 @@ function Home() {
 
         <CardContent>
           <div className="flex flex-col gap-3">
-            <AccountList
-              session={session}
-              selection={selection}
-              setSelection={setSelectionAndStore}
-            />
-
-            {isEmpty && (
-              <p className="py-4 text-center text-sm text-gray-500">
-                추가된 계정이 없습니다. "계정 추가" 버튼을 눌러 계정을 추가해
-                주세요.
-              </p>
+            {status === "pending" ? (
+              <div className="flex size-full items-center justify-center">
+                <Spinner className="size-6" />
+              </div>
+            ) : status === "success" ? (
+              <AccountList
+                session={session}
+                selection={selection}
+                setSelection={setSelectionAndStore}
+              />
+            ) : (
+              isEmpty && (
+                <p className="py-4 text-center text-sm text-gray-500">
+                  추가된 계정이 없습니다. "계정 추가" 버튼을 눌러 계정을 추가해
+                  주세요.
+                </p>
+              )
             )}
           </div>
         </CardContent>
       </Card>
 
       <WriterProvider>
-        <Writer session={session} selection={selection} />
+        {session && <Writer session={session} selection={selection} />}
         <QueueList />
       </WriterProvider>
 
