@@ -4,10 +4,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     restart: unless-stopped
     env_file:
       - .env
     volumes:
-      - ./database.db:/prisma/database.db
+      - type: bind
+        source: ./database.db
+        target: /prisma/database.db

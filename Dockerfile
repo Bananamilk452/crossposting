@@ -12,4 +12,4 @@ COPY . .
 
 RUN pnpm prisma generate
 RUN pnpm build
-CMD ["node", ".output/server/index.mjs"]
+CMD ["pnpm", "migrateandstart"]

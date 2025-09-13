@@ -19,3 +19,4 @@ yarn.lock
 /playwright/.cache/
 
 prisma/*.db
+database.db

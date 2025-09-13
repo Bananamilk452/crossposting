@@ -10,7 +10,8 @@
     "format": "prettier . --write --cache",
     "lint": "eslint . --fix",
     "prisma": "prisma",
-    "tunnel": "pnpx untun@latest tunnel http://localhost:3000"
+    "tunnel": "pnpx untun@latest tunnel http://localhost:3000",
+    "migrateandstart": "pnpm prisma migrate deploy && pnpm prisma generate && node .output/server/index.mjs"
   },
   "dependencies": {
     "@atproto/api": "^0.16.9",
