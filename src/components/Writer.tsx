@@ -46,7 +46,9 @@ export function Writer({ session, selection }: WriterProps) {
 
   const hasMisskey = selection.includes("misskey");
   const localStorageVisibility =
-    localStorage.getItem(VISIBILITY_LOCAL_STORAGE_KEY) || "public";
+    typeof localStorage !== "undefined"
+      ? localStorage.getItem(VISIBILITY_LOCAL_STORAGE_KEY) || "public"
+      : "public";
 
   const form = useForm({
     resolver: zodResolver(writerFormSchema),

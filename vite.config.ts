@@ -14,4 +14,14 @@ export default defineConfig({
     tanstackStart({ customViteReactPlugin: true }),
     viteReact(),
   ],
+  build: {
+    rollupOptions: {
+      external: ["@prisma-app"],
+    },
+  },
+  esbuild: {
+    supported: {
+      "top-level-await": true,
+    },
+  },
 });

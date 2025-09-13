@@ -28,9 +28,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const selectionLocalStorage = localStorage
-    ? localStorage.getItem(SELECTION_LOCAL_STORAGE_KEY)
-    : null;
+  const selectionLocalStorage =
+    typeof localStorage !== "undefined"
+      ? localStorage.getItem(SELECTION_LOCAL_STORAGE_KEY)
+      : null;
 
   const [selection, setSelection] = useState<string[]>(
     JSON.parse(selectionLocalStorage || "[]"),
@@ -49,7 +50,7 @@ function Home() {
     );
   }
   return (
-    <div className="mx-auto flex w-1/2 flex-col gap-6 p-4">
+    <div className="mx-auto flex w-full flex-col gap-6 p-4 sm:w-1/2">
       <Header />
 
       <Card>

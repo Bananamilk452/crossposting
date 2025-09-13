@@ -1,0 +1,13 @@
+services:
+  app:
+    container_name: crossposting
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./database.db:/prisma/database.db
