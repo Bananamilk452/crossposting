@@ -6,6 +6,7 @@ import { useState } from "react";
 import { AccountList } from "~/components/AccountList";
 import { AddAccountModal } from "~/components/AddAccountModal";
 import { WriterProvider } from "~/components/context/WriterContext";
+import { Header } from "~/components/Header";
 import { QueueList } from "~/components/QueueList";
 import { Button } from "~/components/ui/button";
 import {
@@ -49,7 +50,7 @@ function Home() {
   }
   return (
     <div className="mx-auto flex w-1/2 flex-col gap-6 p-4">
-    <div className="mx-auto w-1/2 p-4">
+      <Header />
 
       <Card>
         <CardHeader>
