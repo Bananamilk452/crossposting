@@ -12,4 +12,4 @@ services:
     volumes:
       - type: bind
         source: ./database.db
-        target: /prisma/database.db
+        target: /app/prisma/database.db
