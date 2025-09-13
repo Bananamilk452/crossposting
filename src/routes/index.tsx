@@ -5,6 +5,8 @@ import { useState } from "react";
 
 import { AccountList } from "~/components/AccountList";
 import { AddAccountModal } from "~/components/AddAccountModal";
+import { WriterProvider } from "~/components/context/WriterContext";
+import { QueueList } from "~/components/QueueList";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -13,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Writer } from "~/components/Writer";
 import { SELECTION_LOCAL_STORAGE_KEY } from "~/constants";
 import { getSessionQueryOptions } from "~/server/session";
 
@@ -24,8 +27,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const selectionLocalStorage = localStorage
+    ? localStorage.getItem(SELECTION_LOCAL_STORAGE_KEY)
+    : null;
+
   const [selection, setSelection] = useState<string[]>(
-    JSON.parse(localStorage.getItem(SELECTION_LOCAL_STORAGE_KEY) || "[]"),
+    JSON.parse(selectionLocalStorage || "[]"),
   );
   const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false);
 
@@ -41,7 +48,9 @@ function Home() {
     );
   }
   return (
+    <div className="mx-auto flex w-1/2 flex-col gap-6 p-4">
     <div className="mx-auto w-1/2 p-4">
+
       <Card>
         <CardHeader>
           <CardTitle>계정 목록</CardTitle>
@@ -70,6 +79,11 @@ function Home() {
           </div>
         </CardContent>
       </Card>
+
+      <WriterProvider>
+        <Writer session={session} selection={selection} />
+        <QueueList />
+      </WriterProvider>
 
       <AddAccountModal
         open={isAddAccountModalOpen}
