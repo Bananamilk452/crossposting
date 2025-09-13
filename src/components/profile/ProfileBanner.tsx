@@ -8,13 +8,13 @@ interface ProfileBannerProps {
 
 export function ProfileBanner({ className, user }: ProfileBannerProps) {
   return (
-    <div className={cn("flex gap-2 rounded-lg border p-2", className)}>
+    <div className={cn("flex min-w-0 gap-2 rounded-lg border p-2", className)}>
       <img src={user.avatar} alt="Avatar" className="size-8 rounded-full" />
-      <div className="flex flex-col">
-        <h3 className="line-clamp-1 overflow-hidden text-ellipsis text-sm font-semibold">
+      <div className="flex min-w-0 flex-col">
+        <h3 className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold">
           {user.name}
         </h3>
-        <p className="line-clamp-1 overflow-hidden text-ellipsis text-xs text-gray-600">
+        <p className="overflow-hidden text-ellipsis whitespace-nowrap text-xs text-gray-600">
           @{user.handle}
           {user.host ? `@${user.host}` : ""}
         </p>

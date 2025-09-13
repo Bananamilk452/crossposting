@@ -115,7 +115,7 @@ function AccountListItem({
   return (
     <div className="flex items-center gap-2">
       <Checkbox defaultChecked={defaultValue} onCheckedChange={onSelect} />
-      <Icon className="size-6" />
+      <Icon className="size-6 shrink-0" />
       <ProfileBanner className="grow" user={user} />
       {status === "pending" && <Spinner />}
       <Button
