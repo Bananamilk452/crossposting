@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 
 import { WriterContext } from "~/components/context/WriterContext";
+import { FileButton } from "~/components/FileButton";
+import { FileList } from "~/components/FileList";
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
@@ -32,6 +34,7 @@ import { twitterPost } from "~/server/twitter";
 const writerFormSchema = z.object({
   content: z.string().min(1, "내용을 입력해주세요"),
   visibility: z.enum(MISSKEY.VISIBILITIES),
+  files: z.array(z.instanceof(File)),
 });
 
 type WriterFormData = z.infer<typeof writerFormSchema>;
@@ -57,15 +60,28 @@ export function Writer({ session, selection }: WriterProps) {
       visibility: MISSKEY.VISIBILITIES.includes(localStorageVisibility)
         ? localStorageVisibility
         : "public",
+      files: [],
     },
   });
 
   const content = form.watch("content");
   const visibility = form.watch("visibility");
+  const files = form.watch("files");
 
   useEffect(() => {
     localStorage.setItem(VISIBILITY_LOCAL_STORAGE_KEY, visibility);
   }, [visibility]);
+
+  function handleFileSelect(file: File) {
+    form.setValue("files", [...files, file]);
+  }
+
+  function handleFileDelete(index: number) {
+    form.setValue(
+      "files",
+      files.filter((_, i) => i !== index),
+    );
+  }
 
   const { mutate: twitterPostMutate } = useMutation({
     mutationFn: (data: { id: string; content: string }) =>
@@ -201,6 +217,8 @@ export function Writer({ session, selection }: WriterProps) {
             )}
           />
 
+          <FileList files={files} onDelete={handleFileDelete} />
+
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-gray-600">{content.length}</p>
 
@@ -241,6 +259,9 @@ export function Writer({ session, selection }: WriterProps) {
                 )}
               />
             )}
+
+            <FileButton onFileSelect={handleFileSelect} />
+
             <Button
               type="submit"
               form="writer"
