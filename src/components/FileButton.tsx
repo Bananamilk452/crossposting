@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { Button } from "~/components/ui/button";
 
 interface FileButtonProps {
-  onFileSelect: (file: File) => void;
+  onFileSelect: (file: File[]) => void;
 }
 
 export function FileButton({ onFileSelect }: FileButtonProps) {
@@ -16,14 +16,19 @@ export function FileButton({ onFileSelect }: FileButtonProps) {
         ref={file}
         type="file"
         accept="image/*"
+        multiple
         className="hidden"
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) {
-            onFileSelect(e.target.files[0]);
+            onFileSelect(Array.from(e.target.files));
           }
         }}
       />
-      <Button variant="outline" onClick={() => file.current?.click()}>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => file.current?.click()}
+      >
         <PlusIcon /> 파일 선택
       </Button>
     </>
