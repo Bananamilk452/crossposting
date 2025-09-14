@@ -100,7 +100,10 @@ export async function createNote(
         json: {
           text: content,
           visibility,
-          mediaIds: params.mediaIds,
+          mediaIds:
+            params.mediaIds && params.mediaIds?.length > 0
+              ? params.mediaIds
+              : undefined,
         },
         headers: {
           Authorization: `Bearer ${accessToken}`,
