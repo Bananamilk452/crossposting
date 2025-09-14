@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Spinner } from "~/components/Spinner";
@@ -41,13 +42,20 @@ export function BlueskySignInModal({ open, setOpen }: BlueskySignInModalProps) {
   });
 
   async function onSubmit(data: BlueskySignInFormData) {
-    const { url } = await blueskySignin({
-      data: {
-        handle: data.handle,
-      },
-    });
+    try {
+      const { url } = await blueskySignin({
+        data: {
+          handle: data.handle,
+        },
+      });
 
-    navigate({ href: url });
+      navigate({ href: url });
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(error);
+        toast.error(error.message);
+      }
+    }
   }
 
   return (
