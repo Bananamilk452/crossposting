@@ -86,6 +86,9 @@ export function AccountList({
               setSelection([...selection, account.platform]);
             }
           }}
+          onSignOut={(platform) => {
+            setSelection(selection.filter((p) => p !== platform));
+          }}
         />
       ))}
     </>
@@ -96,10 +99,12 @@ function AccountListItem({
   account,
   defaultValue,
   onSelect,
+  onSignOut,
 }: {
   account: Account;
   defaultValue?: boolean;
   onSelect?: () => void;
+  onSignOut?: (platform: string) => void;
 }) {
   const queryClient = useQueryClient();
   const { user, Icon, signOut: signOutFunction } = account;
@@ -107,6 +112,7 @@ function AccountListItem({
   const { mutate: signOut, status } = useMutation({
     mutationFn: () => signOutFunction(),
     onSuccess: () => {
+      onSignOut?.(account.platform);
       queryClient.invalidateQueries(getSessionQueryOptions);
       toast.success("계정이 성공적으로 로그아웃되었습니다.");
     },
