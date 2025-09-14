@@ -122,7 +122,7 @@ export function Writer({ session, selection }: WriterProps) {
       return twitterUploadFile({ data: formData });
     },
     onMutate: ({ id }) => {
-      updateQueueItem(id, {
+      addToQueue({
         platform: "twitter",
         id,
         status: "pending",
@@ -131,7 +131,7 @@ export function Writer({ session, selection }: WriterProps) {
     },
     onSuccess: (data, variables) => {
       updateQueueItem(variables.id, {
-        status: "pending",
+        status: "success",
         message: "파일 업로드 완료",
         content: variables.file.name,
       });
@@ -183,7 +183,7 @@ export function Writer({ session, selection }: WriterProps) {
       return blueskyUploadFile({ data: formData });
     },
     onMutate: ({ id }) => {
-      updateQueueItem(id, {
+      addToQueue({
         platform: "bluesky",
         id,
         status: "pending",
@@ -192,7 +192,7 @@ export function Writer({ session, selection }: WriterProps) {
     },
     onSuccess: (data, variables) => {
       updateQueueItem(variables.id, {
-        status: "pending",
+        status: "success",
         message: "파일 업로드 완료",
         content: variables.file.name,
       });
@@ -245,7 +245,7 @@ export function Writer({ session, selection }: WriterProps) {
       return misskeyUploadFile({ data: formData });
     },
     onMutate: ({ id }) => {
-      updateQueueItem(id, {
+      addToQueue({
         platform: "misskey",
         id,
         status: "pending",
@@ -254,7 +254,7 @@ export function Writer({ session, selection }: WriterProps) {
     },
     onSuccess: (data, variables) => {
       updateQueueItem(variables.id, {
-        status: "pending",
+        status: "success",
         message: "파일 업로드 완료",
         content: variables.file.name,
       });
@@ -276,7 +276,10 @@ export function Writer({ session, selection }: WriterProps) {
           (
             await Promise.all(
               files.map((file) => {
-                return twitterUploadFileMutate({ id, file });
+                return twitterUploadFileMutate({
+                  id: crypto.randomUUID(),
+                  file,
+                });
               }),
             )
           ).map((res) => res.id) || [];
@@ -289,7 +292,7 @@ export function Writer({ session, selection }: WriterProps) {
         const images =
           (await Promise.all(
             files.map((file) => {
-              return blueskyUploadFileMutate({ id, file });
+              return blueskyUploadFileMutate({ id: crypto.randomUUID(), file });
             }),
           )) || [];
         blueskyPostMutate({ id, content: data.content, images });
@@ -302,7 +305,10 @@ export function Writer({ session, selection }: WriterProps) {
           (
             await Promise.all(
               files.map((file) => {
-                return misskeyUploadFileMutate({ id, file });
+                return misskeyUploadFileMutate({
+                  id: crypto.randomUUID(),
+                  file,
+                });
               }),
             )
           ).map((res) => res.id) || [];
