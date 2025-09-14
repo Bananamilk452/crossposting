@@ -6,6 +6,7 @@ import z from "zod/v3";
 
 import { TWITTER } from "~/constants";
 import { getOptionalSession } from "~/lib/session";
+import { twitterUploadMedia } from "~/lib/twitter";
 
 export const twitterSignIn = createServerFn({
   method: "GET",
@@ -56,7 +57,8 @@ export const twitterSignOut = createServerFn({
 });
 
 const writerFormSchema = z.object({
-  content: z.string().min(1, "내용을 입력해주세요"),
+  content: z.string(),
+  images: z.array(z.string().min(1)),
 });
 
 export const twitterPost = createServerFn({
@@ -66,7 +68,11 @@ export const twitterPost = createServerFn({
     return writerFormSchema.parse(data);
   })
   .handler(async (ctx) => {
-    const { content } = ctx.data;
+    const { content, images } = ctx.data;
+
+    if (content.length === 0 && images.length === 0) {
+      throw new Error("내용이나 파일이 필요합니다.");
+    }
 
     const session = await getOptionalSession();
 
@@ -76,9 +82,40 @@ export const twitterPost = createServerFn({
 
     const twitter = new Client(session.data.twitterAccessToken);
 
-    const tweet = await twitter.tweets.createTweet({ text: content });
+    const tweet = await twitter.tweets.createTweet({
+      text: content,
+      media: { media_ids: images },
+    });
 
     return {
       id: tweet.data?.id,
     };
+  });
+
+export const twitterUploadFile = createServerFn({
+  method: "POST",
+})
+  .validator((data) => {
+    if (!(data instanceof FormData)) {
+      throw new Error("Invalid form data");
+    }
+
+    const body = Object.fromEntries(data);
+    return { file: body.file as File };
+  })
+  .handler(async (ctx) => {
+    const { file } = ctx.data;
+
+    const session = await getOptionalSession();
+
+    if (!session.data.twitter || !session.data.twitterAccessToken) {
+      throw new Error("Twitter 계정이 없습니다.");
+    }
+
+    const { id } = await twitterUploadMedia(
+      session.data.twitterAccessToken,
+      file,
+    );
+
+    return { id };
   });

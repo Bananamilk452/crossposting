@@ -29,7 +29,7 @@ import { MISSKEY, VISIBILITY_LOCAL_STORAGE_KEY } from "~/constants";
 import { Session } from "~/lib/session";
 import { blueskyPost, blueskyUploadFile } from "~/server/bluesky";
 import { misskeyPost, misskeyUploadFile } from "~/server/misskey";
-import { twitterPost } from "~/server/twitter";
+import { twitterPost, twitterUploadFile } from "~/server/twitter";
 
 const writerFormSchema = z.object({
   content: z.string(),
@@ -83,9 +83,13 @@ export function Writer({ session, selection }: WriterProps) {
     );
   }
 
+  type TwitterImage = string;
   const { mutate: twitterPostMutate } = useMutation({
-    mutationFn: (data: { id: string; content: string }) =>
-      twitterPost({ data }),
+    mutationFn: (data: {
+      id: string;
+      content: string;
+      images: TwitterImage[];
+    }) => twitterPost({ data }),
     onMutate: (data) => {
       addToQueue({
         platform: "twitter",
@@ -101,6 +105,35 @@ export function Writer({ session, selection }: WriterProps) {
         message: "작성 완료",
         link: `https://twitter.com/${session.twitter?.id}/status/${data.id}`,
         content: variables.content,
+      });
+    },
+    onError: (error, variables) => {
+      updateQueueItem(variables.id, {
+        status: "error",
+        message: (error as Error).message,
+      });
+    },
+  });
+
+  const { mutateAsync: twitterUploadFileMutate } = useMutation({
+    mutationFn: (data: { id: string; file: File }) => {
+      const formData = new FormData();
+      formData.append("file", data.file);
+      return twitterUploadFile({ data: formData });
+    },
+    onMutate: ({ id }) => {
+      updateQueueItem(id, {
+        platform: "twitter",
+        id,
+        status: "pending",
+        message: "파일 업로드 중...",
+      });
+    },
+    onSuccess: (data, variables) => {
+      updateQueueItem(variables.id, {
+        status: "pending",
+        message: "파일 업로드 완료",
+        content: variables.file.name,
       });
     },
     onError: (error, variables) => {
@@ -204,7 +237,16 @@ export function Writer({ session, selection }: WriterProps) {
     selection.forEach(async (platform) => {
       if (platform === "twitter") {
         const id = crypto.randomUUID();
-        twitterPostMutate({ id, content: data.content });
+        const files = data.files.slice(0, 4); // 최대 4장
+        const images =
+          (
+            await Promise.all(
+              files.map((file) => {
+                return twitterUploadFileMutate({ id, file });
+              }),
+            )
+          ).map((res) => res.id) || [];
+        twitterPostMutate({ id, content: data.content, images });
       }
 
       if (platform === "bluesky") {
