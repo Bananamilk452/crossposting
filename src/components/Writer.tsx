@@ -106,6 +106,8 @@ export function Writer({ session, selection }: WriterProps) {
         link: `https://twitter.com/${session.twitter?.id}/status/${data.id}`,
         content: variables.content,
       });
+      form.setValue("content", "");
+      form.setValue("files", []);
     },
     onError: (error, variables) => {
       updateQueueItem(variables.id, {
@@ -167,6 +169,8 @@ export function Writer({ session, selection }: WriterProps) {
         link: `https://bsky.app/profile/${session.bluesky?.handle}/post/${data.id}`,
         content: variables.content,
       });
+      form.setValue("content", "");
+      form.setValue("files", []);
     },
     onError: (error, variables) => {
       updateQueueItem(variables.id, {
@@ -229,6 +233,8 @@ export function Writer({ session, selection }: WriterProps) {
         link: `https://${session.misskey?.host}/notes/${data.id}`,
         content: variables.content,
       });
+      form.setValue("content", "");
+      form.setValue("files", []);
     },
     onError: (error, variables) => {
       updateQueueItem(variables.id, {
@@ -320,8 +326,6 @@ export function Writer({ session, selection }: WriterProps) {
         });
       }
     });
-
-    form.setValue("content", "");
   }
 
   return (
