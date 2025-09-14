@@ -27,12 +27,12 @@ import {
 import { Textarea } from "~/components/ui/textarea";
 import { MISSKEY, VISIBILITY_LOCAL_STORAGE_KEY } from "~/constants";
 import { Session } from "~/lib/session";
-import { blueskyPost } from "~/server/bluesky";
+import { blueskyPost, blueskyUploadFile } from "~/server/bluesky";
 import { misskeyPost } from "~/server/misskey";
 import { twitterPost } from "~/server/twitter";
 
 const writerFormSchema = z.object({
-  content: z.string().min(1, "내용을 입력해주세요"),
+  content: z.string(),
   visibility: z.enum(MISSKEY.VISIBILITIES),
   files: z.array(z.instanceof(File)),
 });
@@ -72,8 +72,8 @@ export function Writer({ session, selection }: WriterProps) {
     localStorage.setItem(VISIBILITY_LOCAL_STORAGE_KEY, visibility);
   }, [visibility]);
 
-  function handleFileSelect(file: File) {
-    form.setValue("files", [...files, file]);
+  function handleFileSelect(f: File[]) {
+    form.setValue("files", [...files, ...f]);
   }
 
   function handleFileDelete(index: number) {
@@ -111,9 +111,13 @@ export function Writer({ session, selection }: WriterProps) {
     },
   });
 
+  type BlueskyImage = Awaited<ReturnType<typeof blueskyUploadFile>>;
   const { mutate: blueskyPostMutate } = useMutation({
-    mutationFn: (data: { id: string; content: string }) =>
-      blueskyPost({ data }),
+    mutationFn: (data: {
+      id: string;
+      content: string;
+      images: BlueskyImage[];
+    }) => blueskyPost({ data }),
     onMutate: (data) => {
       addToQueue({
         platform: "bluesky",
@@ -168,7 +172,7 @@ export function Writer({ session, selection }: WriterProps) {
   });
 
   function onSubmit(data: WriterFormData) {
-    selection.forEach((platform) => {
+    selection.forEach(async (platform) => {
       if (platform === "twitter") {
         const id = crypto.randomUUID();
         twitterPostMutate({ id, content: data.content });
@@ -176,7 +180,16 @@ export function Writer({ session, selection }: WriterProps) {
 
       if (platform === "bluesky") {
         const id = crypto.randomUUID();
-        blueskyPostMutate({ id, content: data.content });
+        const files = data.files.slice(0, 4); // 최대 4장
+        const images =
+          (await Promise.all(
+            files.map((file) => {
+              const formData = new FormData();
+              formData.append("file", file);
+              return blueskyUploadFile({ data: formData });
+            }),
+          )) || [];
+        blueskyPostMutate({ id, content: data.content, images });
       }
 
       if (platform === "misskey") {
@@ -267,7 +280,7 @@ export function Writer({ session, selection }: WriterProps) {
               form="writer"
               disabled={
                 form.formState.isSubmitting ||
-                content.length === 0 ||
+                (content.length === 0 && files.length === 0) ||
                 selection.length === 0
               }
             >

@@ -1,4 +1,4 @@
-import { Agent, RichText } from "@atproto/api";
+import { BlobRef, RichText } from "@atproto/api";
 import {
   isRecord as isPost,
   validateRecord as validatePost,
@@ -11,6 +11,7 @@ import { TID } from "@atproto/common";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { blueskyUploadBlob, getAgent } from "~/lib/bluesky";
 import { blueskyClient } from "~/lib/bluesky/client";
 import { getOptionalSession } from "~/lib/session";
 
@@ -64,7 +65,22 @@ export const blueskySignOut = createServerFn({
 });
 
 const writerFormSchema = z.object({
-  content: z.string().min(1, "내용을 입력해주세요"),
+  content: z.string(),
+  images: z.array(
+    z.object({
+      alt: z.string(),
+      aspectRatio: z.object({
+        height: z.number(),
+        width: z.number(),
+      }),
+      image: z.object({
+        $type: z.literal("blob"),
+        ref: z.object({ $link: z.string() }),
+        mimeType: z.string(),
+        size: z.number(),
+      }),
+    }),
+  ),
 });
 
 export const blueskyPost = createServerFn({
@@ -74,7 +90,11 @@ export const blueskyPost = createServerFn({
     return writerFormSchema.parse(data);
   })
   .handler(async (ctx) => {
-    const { content } = ctx.data;
+    const { content, images } = ctx.data;
+
+    if (content.length === 0 && images.length === 0) {
+      throw new Error("내용이나 파일이 필요합니다.");
+    }
 
     const session = await getOptionalSession();
 
@@ -82,8 +102,7 @@ export const blueskyPost = createServerFn({
       throw new Error("Bluesky 계정이 없습니다.");
     }
 
-    const client = await blueskyClient.restore(session.data.bluesky.id);
-    const agent = new Agent(client);
+    const agent = await getAgent(session.data.bluesky.id);
 
     const rkey = TID.nextStr();
 
@@ -95,6 +114,13 @@ export const blueskyPost = createServerFn({
       text: rt.text,
       facets: rt.facets,
       langs: ["ko"],
+      embed: {
+        $type: "app.bsky.embed.images",
+        images: images.map((i) => ({
+          ...i,
+          image: new BlobRef(i.image.ref, i.image.mimeType, i.image.size),
+        })),
+      },
       createdAt: new Date().toISOString(),
     };
 
@@ -120,10 +146,37 @@ export const blueskyPost = createServerFn({
         writes: [writes],
       });
     } else {
+      console.log(postValidation);
+      console.log(writeValidation);
       throw new Error("Post validation failed");
     }
 
     return {
       id: rkey,
     };
+  });
+
+export const blueskyUploadFile = createServerFn({
+  method: "POST",
+})
+  .validator((data) => {
+    if (!(data instanceof FormData)) {
+      throw new Error("Invalid form data");
+    }
+
+    const body = Object.fromEntries(data);
+    return { file: body.file as File };
+  })
+  .handler(async (ctx) => {
+    const { file } = ctx.data;
+
+    const session = await getOptionalSession();
+
+    if (!session.data.bluesky) {
+      throw new Error("Bluesky 계정이 없습니다.");
+    }
+
+    const embed = await blueskyUploadBlob(file);
+
+    return embed;
   });
