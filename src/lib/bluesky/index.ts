@@ -2,7 +2,6 @@ import { Agent } from "@atproto/api";
 import { imageSize } from "image-size";
 
 import { blueskyClient } from "~/lib/bluesky/client";
-import { getOptionalSession } from "~/lib/session";
 
 export async function getAgent(did: string) {
   const session = await blueskyClient.restore(did);

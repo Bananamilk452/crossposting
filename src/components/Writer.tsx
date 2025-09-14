@@ -176,9 +176,43 @@ export function Writer({ session, selection }: WriterProps) {
     },
   });
 
+  const { mutateAsync: blueskyUploadFileMutate } = useMutation({
+    mutationFn: (data: { id: string; file: File }) => {
+      const formData = new FormData();
+      formData.append("file", data.file);
+      return blueskyUploadFile({ data: formData });
+    },
+    onMutate: ({ id }) => {
+      updateQueueItem(id, {
+        platform: "bluesky",
+        id,
+        status: "pending",
+        message: "파일 업로드 중...",
+      });
+    },
+    onSuccess: (data, variables) => {
+      updateQueueItem(variables.id, {
+        status: "pending",
+        message: "파일 업로드 완료",
+        content: variables.file.name,
+      });
+    },
+    onError: (error, variables) => {
+      updateQueueItem(variables.id, {
+        status: "error",
+        message: (error as Error).message,
+      });
+    },
+  });
+
+  type MisskeyImage = string;
   const { mutate: misskeyPostMutate } = useMutation({
-    mutationFn: (data: { id: string; content: string; visibility: string }) =>
-      misskeyPost({ data }),
+    mutationFn: (data: {
+      id: string;
+      content: string;
+      visibility: string;
+      images: MisskeyImage[];
+    }) => misskeyPost({ data }),
     onMutate: (data) => {
       addToQueue({
         platform: "misskey",
@@ -255,9 +289,7 @@ export function Writer({ session, selection }: WriterProps) {
         const images =
           (await Promise.all(
             files.map((file) => {
-              const formData = new FormData();
-              formData.append("file", file);
-              return blueskyUploadFile({ data: formData });
+              return blueskyUploadFileMutate({ id, file });
             }),
           )) || [];
         blueskyPostMutate({ id, content: data.content, images });
