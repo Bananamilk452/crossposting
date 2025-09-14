@@ -72,6 +72,13 @@ export const Route = createRootRouteWithContext<{
         href: "/callback/misskey",
       },
     ],
+    scripts: [
+      {
+        defer: true,
+        "data-domain": "crossposting.junsu.io",
+        src: "https://plausible.junsu.io/js/script.js",
+      },
+    ],
   }),
   errorComponent: (props) => {
     return (
