@@ -25,11 +25,12 @@ export function FileButton({ onFileSelect }: FileButtonProps) {
         }}
       />
       <Button
+        className="size-9 sm:size-auto"
         type="button"
         variant="outline"
         onClick={() => file.current?.click()}
       >
-        <PlusIcon /> 파일 선택
+        <PlusIcon /> <span className="sr-only sm:not-sr-only">파일 선택</span>
       </Button>
     </>
   );

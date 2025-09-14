@@ -5,6 +5,7 @@ import { z } from "zod";
 import { MISSKEY } from "~/constants";
 import {
   createNote,
+  driveCreate,
   getOAuth2CallbackURL,
   getOAuth2Endpoint,
 } from "~/lib/misskey";
@@ -66,8 +67,9 @@ export const misskeySignOut = createServerFn({
 });
 
 const writerFormSchema = z.object({
-  content: z.string().min(1, "내용을 입력해주세요"),
+  content: z.string(),
   visibility: z.enum(MISSKEY.VISIBILITIES),
+  images: z.array(z.string().min(1)),
 });
 
 export const misskeyPost = createServerFn({
@@ -77,7 +79,11 @@ export const misskeyPost = createServerFn({
     return writerFormSchema.parse(data);
   })
   .handler(async (ctx) => {
-    const { content, visibility } = ctx.data;
+    const { content, visibility, images } = ctx.data;
+
+    if (content.length === 0 && images.length === 0) {
+      throw new Error("내용이나 파일이 필요합니다.");
+    }
 
     const session = await getOptionalSession();
 
@@ -95,7 +101,41 @@ export const misskeyPost = createServerFn({
       {
         content,
         visibility,
+        mediaIds: images,
       },
+    );
+
+    return { id };
+  });
+
+export const misskeyUploadFile = createServerFn({
+  method: "POST",
+})
+  .validator((data) => {
+    if (!(data instanceof FormData)) {
+      throw new Error("Invalid form data");
+    }
+
+    const body = Object.fromEntries(data);
+    return { file: body.file as File };
+  })
+  .handler(async (ctx) => {
+    const { file } = ctx.data;
+
+    const session = await getOptionalSession();
+
+    if (
+      !session.data.misskey ||
+      !session.data.misskey.host ||
+      !session.data.misskeyAccessToken
+    ) {
+      throw new Error("Misskey 계정이 없습니다.");
+    }
+
+    const { id } = await driveCreate(
+      session.data.misskey.host,
+      session.data.misskeyAccessToken,
+      file,
     );
 
     return { id };

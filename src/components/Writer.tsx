@@ -28,7 +28,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { MISSKEY, VISIBILITY_LOCAL_STORAGE_KEY } from "~/constants";
 import { Session } from "~/lib/session";
 import { blueskyPost, blueskyUploadFile } from "~/server/bluesky";
-import { misskeyPost } from "~/server/misskey";
+import { misskeyPost, misskeyUploadFile } from "~/server/misskey";
 import { twitterPost } from "~/server/twitter";
 
 const writerFormSchema = z.object({
@@ -171,6 +171,35 @@ export function Writer({ session, selection }: WriterProps) {
     },
   });
 
+  const { mutateAsync: misskeyUploadFileMutate } = useMutation({
+    mutationFn: (data: { id: string; file: File }) => {
+      const formData = new FormData();
+      formData.append("file", data.file);
+      return misskeyUploadFile({ data: formData });
+    },
+    onMutate: ({ id }) => {
+      updateQueueItem(id, {
+        platform: "misskey",
+        id,
+        status: "pending",
+        message: "파일 업로드 중...",
+      });
+    },
+    onSuccess: (data, variables) => {
+      updateQueueItem(variables.id, {
+        status: "pending",
+        message: "파일 업로드 완료",
+        content: variables.file.name,
+      });
+    },
+    onError: (error, variables) => {
+      updateQueueItem(variables.id, {
+        status: "error",
+        message: (error as Error).message,
+      });
+    },
+  });
+
   function onSubmit(data: WriterFormData) {
     selection.forEach(async (platform) => {
       if (platform === "twitter") {
@@ -194,10 +223,20 @@ export function Writer({ session, selection }: WriterProps) {
 
       if (platform === "misskey") {
         const id = crypto.randomUUID();
+        const files = data.files.slice(0, 16); // 최대 16장
+        const images =
+          (
+            await Promise.all(
+              files.map((file) => {
+                return misskeyUploadFileMutate({ id, file });
+              }),
+            )
+          ).map((res) => res.id) || [];
         misskeyPostMutate({
           id,
           content: data.content,
           visibility: data.visibility,
+          images,
         });
       }
     });

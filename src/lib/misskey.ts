@@ -89,7 +89,7 @@ export async function getMe(hostname: string, accessToken: string) {
 export async function createNote(
   hostname: string,
   accessToken: string,
-  params: { content: string; visibility: string },
+  params: { content: string; visibility: string; mediaIds?: string[] },
 ) {
   const { content, visibility } = params;
 
@@ -100,6 +100,7 @@ export async function createNote(
         json: {
           text: content,
           visibility,
+          mediaIds: params.mediaIds,
         },
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -109,4 +110,24 @@ export async function createNote(
     .json();
 
   return note.createdNote.id;
+}
+
+export async function driveCreate(
+  hostname: string,
+  accessToken: string,
+  file: File,
+) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const note = await ky
+    .post<{ id: string }>(`https://${hostname}/api/drive/files/create`, {
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    .json();
+
+  return { id: note.id };
 }
