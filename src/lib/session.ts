@@ -43,5 +43,6 @@ export async function getOptionalSession() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   return await useSession<Session>({
     password: process.env.COOKIE_PASSWORD as string,
+    maxAge: 60 * 60 * 24 * 30, // 30 days
   });
 }
