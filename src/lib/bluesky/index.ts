@@ -11,15 +11,7 @@ export async function getAgent(did: string) {
   return agent;
 }
 
-export async function blueskyUploadBlob(file: File) {
-  const session = await getOptionalSession();
-
-  if (!session.data.bluesky) {
-    throw new Error("Bluesky 계정이 없습니다.");
-  }
-
-  const agent = await getAgent(session.data.bluesky.id);
-
+export async function blueskyUploadBlob(agent: Agent, file: File) {
   const upload = await agent.uploadBlob(new Blob([file], { type: file.type }));
 
   const arrayBuffer = await file.arrayBuffer();

@@ -176,7 +176,9 @@ export const blueskyUploadFile = createServerFn({
       throw new Error("Bluesky 계정이 없습니다.");
     }
 
-    const embed = await blueskyUploadBlob(file);
+    const agent = await getAgent(session.data.bluesky.id);
+
+    const embed = await blueskyUploadBlob(agent, file);
 
     return embed;
   });
