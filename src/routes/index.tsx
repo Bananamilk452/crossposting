@@ -68,19 +68,21 @@ function Home() {
               <div className="flex size-full items-center justify-center">
                 <Spinner className="size-6" />
               </div>
-            ) : status === "success" ? (
+            ) : status === "error" ? (
+              <p className="py-4 text-center text-sm text-gray-500">
+                세션을 불러오는 중 오류가 발생했습니다. 새로고침 해주세요.
+              </p>
+            ) : isEmpty ? (
+              <p className="py-4 text-center text-sm text-gray-500">
+                추가된 계정이 없습니다. "계정 추가" 버튼을 눌러 계정을 추가해
+                주세요.
+              </p>
+            ) : (
               <AccountList
                 session={session}
                 selection={selection}
                 setSelection={setSelectionAndStore}
               />
-            ) : (
-              isEmpty && (
-                <p className="py-4 text-center text-sm text-gray-500">
-                  추가된 계정이 없습니다. "계정 추가" 버튼을 눌러 계정을 추가해
-                  주세요.
-                </p>
-              )
             )}
           </div>
         </CardContent>
