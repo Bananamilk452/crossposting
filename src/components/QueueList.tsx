@@ -80,9 +80,9 @@ function QueueListItem({ item }: { item: QueueItem }) {
         </a>
       )}
 
-      {(item.status === "error" && item.platform === 'twitter')&& (
+      {item.status === "error" && item.platform === "twitter" && (
         <a
-          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(item.content || '')}`}
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(item.content || "")}`}
           className="ml-2 flex shrink-0 cursor-pointer items-center gap-1 text-sm text-blue-600 hover:underline"
           target="_blank"
           rel="noopener noreferrer"
