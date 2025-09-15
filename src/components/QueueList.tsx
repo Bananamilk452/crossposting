@@ -79,6 +79,18 @@ function QueueListItem({ item }: { item: QueueItem }) {
           링크
         </a>
       )}
+
+      {(item.status === "error" && item.platform === 'twitter')&& (
+        <a
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(item.content || '')}`}
+          className="ml-2 flex shrink-0 cursor-pointer items-center gap-1 text-sm text-blue-600 hover:underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <SquareArrowOutUpRightIcon className="inline size-4" />
+          수동으로 전송
+        </a>
+      )}
     </li>
   );
 }
