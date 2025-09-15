@@ -84,7 +84,7 @@ export const twitterPost = createServerFn({
 
     const tweet = await twitter.tweets.createTweet({
       text: content,
-      media: { media_ids: images },
+      media: images.length > 0 ? { media_ids: images } : undefined,
     });
 
     return {
