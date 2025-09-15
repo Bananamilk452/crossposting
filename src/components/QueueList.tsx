@@ -51,7 +51,7 @@ function QueueListItem({ item }: { item: QueueItem }) {
         <MisskeyIcon className="size-6 shrink-0" />
       )}
 
-      {item.status === "pending" && <Spinner />}
+      {item.status === "pending" && <Spinner className="shrink-0" />}
       {item.status === "success" && (
         <CheckCircleIcon className="size-5 shrink-0 text-green-600" />
       )}
