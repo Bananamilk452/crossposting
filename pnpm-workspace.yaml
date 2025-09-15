@@ -6,3 +6,4 @@ onlyBuiltDependencies:
   - cbor-extract
   - esbuild
   - prisma
+  - sharp
