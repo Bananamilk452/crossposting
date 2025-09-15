@@ -43,11 +43,9 @@ const createImageFromFile = (file: File): Promise<HTMLImageElement> => {
     const url = URL.createObjectURL(file);
     image.onload = () => {
       resolve(image);
-      URL.revokeObjectURL(url);
     };
     image.onerror = (error) => {
       reject(error);
-      URL.revokeObjectURL(url);
     };
     image.src = url;
   });
