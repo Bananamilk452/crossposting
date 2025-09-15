@@ -4,7 +4,6 @@ import ky from "ky";
 
 import { MISSKEY } from "~/constants";
 import { MisskeyUser } from "~/lib/session";
-import { resizeImage } from "~/server/utils";
 
 interface OAuthEndpoint {
   issuer: string;
@@ -121,10 +120,8 @@ export async function driveCreate(
   accessToken: string,
   file: File,
 ) {
-  const image = new Blob([await resizeImage(file)], { type: "image/webp" });
-
   const formData = new FormData();
-  formData.append("file", image);
+  formData.append("file", file);
 
   const note = await ky
     .post<{ id: string }>(`https://${hostname}/api/drive/files/create`, {

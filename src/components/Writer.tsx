@@ -30,6 +30,7 @@ import { Session } from "~/lib/session";
 import { blueskyPost, blueskyUploadFile } from "~/server/bluesky";
 import { misskeyPost, misskeyUploadFile } from "~/server/misskey";
 import { twitterPost, twitterUploadFile } from "~/server/twitter";
+import { resizeImage } from "~/utils";
 
 const writerFormSchema = z.object({
   content: z.string(),
@@ -273,11 +274,15 @@ export function Writer({ session, selection }: WriterProps) {
     },
   });
 
-  function onSubmit(data: WriterFormData) {
+  async function onSubmit(data: WriterFormData) {
+    const resized = await Promise.all(
+      data.files.map(async (f) => await resizeImage(f)),
+    );
+
     selection.forEach(async (platform) => {
       if (platform === "twitter") {
         const id = crypto.randomUUID();
-        const files = data.files.slice(0, 4); // 최대 4장
+        const files = resized.slice(0, 4); // 최대 4장
         const images =
           (
             await Promise.all(
@@ -294,7 +299,7 @@ export function Writer({ session, selection }: WriterProps) {
 
       if (platform === "bluesky") {
         const id = crypto.randomUUID();
-        const files = data.files.slice(0, 4); // 최대 4장
+        const files = resized.slice(0, 4); // 최대 4장
         const images =
           (await Promise.all(
             files.map((file) => {
@@ -306,7 +311,7 @@ export function Writer({ session, selection }: WriterProps) {
 
       if (platform === "misskey") {
         const id = crypto.randomUUID();
-        const files = data.files.slice(0, 16); // 최대 16장
+        const files = resized.slice(0, 16); // 최대 16장
         const images =
           (
             await Promise.all(
