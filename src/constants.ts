@@ -4,6 +4,10 @@ export const TWITTER = {
   SCOPES: ["users.read", "tweet.read", "tweet.write", "media.write"],
 };
 
+export const BLUESKY = {
+  MAX_IMAGE_SIZE: 970000, // 970kb
+};
+
 export const MISSKEY = {
   STATE_COOKIE_NAME: "misskey_state",
   CODE_VERIFIER_COOKIE_NAME: "misskey_code_verifier",
