@@ -5,7 +5,7 @@ export const TWITTER = {
 };
 
 export const BLUESKY = {
-  MAX_IMAGE_SIZE: 970000, // 970kb
+  MAX_IMAGE_SIZE: 900000, // 900kb
 };
 
 export const MISSKEY = {
