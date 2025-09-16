@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
-import { MISSKEY, VISIBILITY_LOCAL_STORAGE_KEY } from "~/constants";
+import { BLUESKY, MISSKEY, VISIBILITY_LOCAL_STORAGE_KEY } from "~/constants";
 import { Session } from "~/lib/session";
 import { blueskyPost, blueskyUploadFile } from "~/server/bluesky";
 import { misskeyPost, misskeyUploadFile } from "~/server/misskey";
@@ -279,6 +279,15 @@ export function Writer({ session, selection }: WriterProps) {
       data.files.map(async (f) => await resizeImage(f)),
     );
 
+    // 얘 혼자 970KB 제한 있음
+    const blueskyResized = selection.includes("bluesky")
+      ? await Promise.all(
+          data.files
+            .slice(0, 4)
+            .map(async (f) => await resizeImage(f, BLUESKY.MAX_IMAGE_SIZE)),
+        )
+      : [];
+
     selection.forEach(async (platform) => {
       if (platform === "twitter") {
         const id = crypto.randomUUID();
@@ -299,10 +308,9 @@ export function Writer({ session, selection }: WriterProps) {
 
       if (platform === "bluesky") {
         const id = crypto.randomUUID();
-        const files = resized.slice(0, 4); // 최대 4장
         const images =
           (await Promise.all(
-            files.map((file) => {
+            blueskyResized.map((file) => {
               return blueskyUploadFileMutate({ id: crypto.randomUUID(), file });
             }),
           )) || [];
