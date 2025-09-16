@@ -73,8 +73,8 @@ const encodeAndResizeIfNeeded = (
         }
 
         if (limit && blob.size > limit && (width > 1 || height > 1)) {
-          const newWidth = Math.floor(width / 2);
-          const newHeight = Math.floor(height / 2);
+          const newWidth = Math.floor((width / 3) * 2);
+          const newHeight = Math.floor((height / 3) * 2);
           resolve(
             encodeAndResizeIfNeeded(
               canvas,
