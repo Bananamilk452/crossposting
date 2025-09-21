@@ -42,9 +42,11 @@ const createImageFromFile = (file: File): Promise<HTMLImageElement> => {
     const image = new Image();
     const url = URL.createObjectURL(file);
     image.onload = () => {
+      URL.revokeObjectURL(url);
       resolve(image);
     };
     image.onerror = (error) => {
+      URL.revokeObjectURL(url);
       reject(error);
     };
     image.src = url;

@@ -15,13 +15,11 @@ export function FileButton({ onFileSelect }: FileButtonProps) {
       <input
         ref={file}
         type="file"
-        accept="image/*"
         multiple
         className="hidden"
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) {
             onFileSelect(Array.from(e.target.files));
-            e.target.value = "";
           }
         }}
       />
