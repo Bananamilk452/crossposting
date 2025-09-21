@@ -15,7 +15,6 @@ export function FileButton({ onFileSelect }: FileButtonProps) {
       <input
         ref={file}
         type="file"
-        accept="image/*"
         multiple
         className="hidden"
         onChange={(e) => {
